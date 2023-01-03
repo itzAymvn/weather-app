@@ -9,37 +9,39 @@ import WeatherBox from "./components/WeatherBox";
 // App()
 
 function App() {
-    // The base URL and API key are stored in the .env file.
+    // Function to check if an object is empty.
+    function isEmpty(obj) {
+        return Object.keys(obj).length === 0;
+    }
 
-    const api = {
-        key: process.env.REACT_APP_KEY,
-        base: process.env.REACT_APP_BASE_URL,
-    };
-
+    const api = process.env.REACT_APP_API;
     // State to store the weather data.
 
     const [weather, setWeather] = useState({});
 
     // get the main object from the weather object. (weather.main)
 
-    const { main } = weather;
-
-    // Check if the weather object is defined and if the temperature is above 20 degrees. and set the class name accordingly.
-
-    const isWeatherDefined = typeof main !== "undefined";
-    const isWarm = main?.temp > 20;
-    const className = `app ${isWeatherDefined && isWarm ? "warm" : "cold"}`;
-
     return (
-        <div className={className}>
-            <main>
+        <div>
+            <main
+                className={
+                    "app " +
+                    (!isEmpty(weather)
+                        ? weather.currentConditions.temp > 16
+                            ? "warm"
+                            : "cold"
+                        : "")
+                }>
                 <SearchBar api={api} setWeather={setWeather} />
-                {isWeatherDefined && (
-                    <>
-                        <LocationBox weather={weather} />
-                        <WeatherBox weather={weather} />
-                    </>
-                )}
+                {
+                    // If the weather object is not empty, render the LocationBox and WeatherBox components.
+                    !isEmpty(weather) && (
+                        <>
+                            <LocationBox weather={weather} />
+                            <WeatherBox weather={weather} />
+                        </>
+                    )
+                }
             </main>
         </div>
     );

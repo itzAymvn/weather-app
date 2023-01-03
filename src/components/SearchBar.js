@@ -1,42 +1,40 @@
 import React, { useEffect, useState } from "react";
 
 const SearchBar = ({ setWeather, api }) => {
-    // State to store the query.
-
     const [query, setQuery] = useState("");
 
-    // Get the current location, and set the weather state. (If the user allows it.)
-
     useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    // Destructure the latitude and longitude from the position object.
-
-                    const { latitude, longitude } = position.coords;
-                    const response = await fetch(
-                        `${api.base}weather?lat=${latitude}&lon=${longitude}&units=metric&APPID=${api.key}`
-                    );
-                    const data = await response.json();
-                    setWeather(data);
-                },
-                (error) => {
-                    alert(error.message);
-                }
+        async function getLocation() {
+            const response = await fetch("https://api.ipify.org?format=json");
+            const user = await response.json();
+            const ip = user.ip;
+            const res = await fetch(`http://ip-api.com/json/${ip}`);
+            const location = await res.json();
+            const weather = await fetch(
+                `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location.city}?unitGroup=metric&key=${api}&contentType=json`
             );
-        } else {
-            alert("Geolocation is not supported by this browser.");
+            const data = await weather.json();
+            setWeather(data);
         }
-    }, [api.base, api.key, setWeather]);
+        getLocation();
+    }, [api, setWeather]);
 
     const search = async (e) => {
         if (e.key === "Enter") {
-            const response = await fetch(
-                `${api.base}weather?q=${query}&units=metric&appid=${api.key}`
-            );
-            const data = await response.json();
-            setWeather(data);
-            setQuery("");
+            try {
+                const response = await fetch(
+                    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${query}?unitGroup=metric&key=${api}&contentType=json`
+                );
+                const data = await response.json();
+                setWeather(data);
+                setQuery("");
+            } catch (error) {
+                if (error) {
+                    alert(query + " is not a valid location");
+                } else {
+                    alert("Something went wrong");
+                }
+            }
         }
     };
 

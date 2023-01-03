@@ -38,14 +38,12 @@ const dateBuilder = (d) => {
 
 const LocationBox = ({ weather }) => {
     // Deconstruct the weather object to get the name and sys object.
-    const { name, sys } = weather;
-    const { country } = sys;
     const currentDate = dateBuilder(new Date());
 
     return (
         <div className="location-box">
             <div className="location">
-                {name}, {country}
+                {weather.address}, {weather.resolvedAddress}
             </div>
             <div className="date">{currentDate}</div>
         </div>
