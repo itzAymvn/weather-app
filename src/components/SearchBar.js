@@ -8,7 +8,7 @@ const SearchBar = ({ setWeather, api }) => {
             const response = await fetch("https://api.ipify.org?format=json");
             const user = await response.json();
             const ip = user.ip;
-            const res = await fetch(`http://ip-api.com/json/${ip}`);
+            const res = await fetch(`https://ipapi.co/${ip}/json`);
             const location = await res.json();
             const weather = await fetch(
                 `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location.city}?unitGroup=metric&key=${api}&contentType=json`
