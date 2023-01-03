@@ -13,7 +13,7 @@ const SearchBar = ({ setWeather, api }) => {
                     setWeather(res.data);
                 })
                 .catch((err) => {
-                    console.error("Unknown location.");
+                    return false;
                 });
         },
         [api, setWeather]
@@ -30,10 +30,16 @@ const SearchBar = ({ setWeather, api }) => {
             const ip = await getIP();
             const res = await fetch(`https://ipapi.co/${ip}/json/`);
             const data = await res.json();
-            return data.city;
+            return [data.city, data.region, data.country_name];
         }
         city().then((city) => {
-            getWeather(city);
+            city.map((c) => {
+                try {
+                    getWeather(c);
+                } catch (err) {
+                    return false;
+                }
+            });
         });
     }, [getWeather]);
 
