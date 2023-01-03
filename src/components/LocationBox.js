@@ -1,7 +1,7 @@
 import React from "react";
 
 // Function that renders the test in the format: Sunday 1 January 2023.
-const dateBuilder = (d) => {
+export const dateBuilder = (d) => {
     let months = [
         "January",
         "February",

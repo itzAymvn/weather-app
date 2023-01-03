@@ -1,54 +1,60 @@
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import React, { useCallback, useEffect } from "react";
 
 const SearchBar = ({ setWeather, api }) => {
-    const [query, setQuery] = useState("");
-
-    useEffect(() => {
-        async function getLocation() {
-            const response = await fetch("https://api.ipify.org?format=json");
-            const user = await response.json();
-            const ip = user.ip;
-            const res = await fetch(`https://ipapi.co/${ip}/json`);
-            const location = await res.json();
-            const weather = await fetch(
-                `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location.city}?unitGroup=metric&key=${api}&contentType=json`
-            );
-            const data = await weather.json();
-            setWeather(data);
-        }
-        getLocation();
-    }, [api, setWeather]);
-
-    const search = async (e) => {
-        if (e.key === "Enter") {
-            try {
-                const response = await fetch(
+    // Function to get the weather data from the API. (Take the city name as a parameter.)
+    const getWeather = useCallback(
+        (query) => {
+            axios
+                .get(
                     `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${query}?unitGroup=metric&key=${api}&contentType=json`
-                );
-                const data = await response.json();
-                setWeather(data);
-                setQuery("");
-            } catch (error) {
-                if (error) {
-                    alert(query + " is not a valid location");
-                } else {
-                    alert("Something went wrong");
-                }
-            }
+                )
+                .then((res) => {
+                    setWeather(res.data);
+                })
+                .catch((err) => {
+                    console.error("Unknown location.");
+                });
+        },
+        [api, setWeather]
+    );
+
+    // Get the user's location and get the weather data for that location. (Using the ipify and ipapi APIs.)
+    useEffect(() => {
+        async function getIP() {
+            const res = await fetch("https://api.ipify.org?format=json");
+            const data = await res.json();
+            return data.ip;
         }
+        async function city() {
+            const ip = await getIP();
+            const res = await fetch(`https://ipapi.co/${ip}/json/`);
+            const data = await res.json();
+            return data.city;
+        }
+        city().then((city) => {
+            getWeather(city);
+        });
+    }, [getWeather]);
+
+    // Function to handle the form submission.
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        if (e.target.query.value === "") return;
+        getWeather(e.target.query.value);
     };
 
     return (
         <div className="search-box">
             <h1 className="search-title">Weather App</h1>
-            <input
-                type="text"
-                className="search-bar"
-                placeholder="Search..."
-                onChange={(e) => setQuery(e.target.value)}
-                value={query}
-                onKeyDown={search}
-            />
+            <form onSubmit={onSubmit}>
+                <input
+                    type="text"
+                    className="search-bar"
+                    placeholder="Search..."
+                    name="query"
+                />
+            </form>
         </div>
     );
 };

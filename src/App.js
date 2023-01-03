@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import LocationBox from "./components/LocationBox";
 import SearchBar from "./components/SearchBar";
 import WeatherBox from "./components/WeatherBox";
+import Forecast from "./components/Forecast";
 
 // App()
 
@@ -27,7 +28,7 @@ function App() {
                 className={
                     "app " +
                     (!isEmpty(weather)
-                        ? weather.currentConditions.temp > 16
+                        ? weather.currentConditions.temp > 20
                             ? "warm"
                             : "cold"
                         : "")
@@ -39,6 +40,7 @@ function App() {
                         <>
                             <LocationBox weather={weather} />
                             <WeatherBox weather={weather} />
+                            <Forecast weather={weather} />
                         </>
                     )
                 }
