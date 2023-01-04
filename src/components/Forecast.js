@@ -13,7 +13,7 @@ const Forecast = ({ days }) => {
                         <div className="tempicon">
                             <img
                                 src={require(`../assets/weather-icons/${day.icon}.png`)}
-                                alt="weather icon"
+                                alt="weather-icon"
                             />
                         </div>
                         <div className="temp">

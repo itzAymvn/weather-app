@@ -26,7 +26,7 @@ function App() {
 
     return (
         <div>
-            <main
+            <div
                 className={
                     "app " +
                     (!isEmpty(weather)
@@ -34,7 +34,8 @@ function App() {
                             ? "warm"
                             : "cold"
                         : "")
-                }>
+                }></div>
+            <main className="content">
                 <SearchBar
                     api={api}
                     setWeather={setWeather}
