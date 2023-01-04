@@ -19,6 +19,7 @@ function App() {
     // State to store the weather data.
 
     const [weather, setWeather] = useState({});
+    const [error, setError] = useState("");
 
     // get the main object from the weather object. (weather.main)
 
@@ -33,7 +34,11 @@ function App() {
                             : "cold"
                         : "")
                 }>
-                <SearchBar api={api} setWeather={setWeather} />
+                <SearchBar
+                    api={api}
+                    setWeather={setWeather}
+                    setError={setError}
+                />
                 {
                     // If the weather object is not empty, render the LocationBox and WeatherBox components.
                     !isEmpty(weather) && (
@@ -43,7 +48,8 @@ function App() {
                             <Forecast weather={weather} />
                         </>
                     )
-                }
+                }{" "}
+                {error && <p className="error">{error}</p>}
             </main>
         </div>
     );

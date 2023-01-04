@@ -1,23 +1,8 @@
 import axios from "axios";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-const SearchBar = ({ setWeather, api }) => {
-    // Function to get the weather data from the API. (Take the city name as a parameter.)
-    const getWeather = useCallback(
-        (query) => {
-            axios
-                .get(
-                    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${query}?unitGroup=metric&key=${api}&contentType=json`
-                )
-                .then((res) => {
-                    setWeather(res.data);
-                })
-                .catch((err) => {
-                    return false;
-                });
-        },
-        [api, setWeather]
-    );
+const SearchBar = ({ setWeather, api, setError }) => {
+    const [query, setQuery] = useState("");
 
     // Get the user's location and get the weather data for that location. (Using the ipify and ipapi APIs.)
     useEffect(() => {
@@ -30,25 +15,44 @@ const SearchBar = ({ setWeather, api }) => {
             const ip = await getIP();
             const res = await fetch(`https://ipapi.co/${ip}/json/`);
             const data = await res.json();
-            return [data.city, data.region, data.country_name];
+            return data;
         }
-        city().then((city) => {
-            city.map((c) => {
-                try {
-                    getWeather(c);
-                } catch (err) {
-                    return false;
-                }
-            });
+        city().then((res) => {
+            console.log(res);
+            setQuery(res.city);
         });
-    }, [getWeather]);
+    }, []);
 
     // Function to handle the form submission.
     const onSubmit = async (e) => {
         e.preventDefault();
         if (e.target.query.value === "") return;
-        getWeather(e.target.query.value);
+        setQuery(e.target.query.value);
     };
+
+    // Function to get the weather data from the API. (Take the city name as a parameter.)
+    const getWeather = useCallback(
+        (query) => {
+            setWeather({});
+            axios
+                .get(
+                    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${query}?unitGroup=metric&key=${api}&contentType=json`
+                )
+                .then((res) => {
+                    setWeather(res.data);
+                })
+                .catch((err) => {
+                    setError(err.request.response);
+                });
+        },
+        [api, setWeather, setError]
+    );
+
+    // Get the weather data when the query state changes.
+    useEffect(() => {
+        if (query === "") return;
+        getWeather(query);
+    }, [query, getWeather]);
 
     return (
         <div className="search-box">
