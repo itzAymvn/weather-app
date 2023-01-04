@@ -20,6 +20,7 @@ function App() {
 
     const [weather, setWeather] = useState({});
     const [error, setError] = useState("");
+    const [seeForecast, setSeeForecast] = useState(false);
 
     // get the main object from the weather object. (weather.main)
 
@@ -45,7 +46,13 @@ function App() {
                         <>
                             <LocationBox weather={weather} />
                             <WeatherBox weather={weather} />
-                            <Forecast weather={weather} />
+                            <button
+                                className="forecast-button"
+                                onClick={() => setSeeForecast(!seeForecast)}>
+                                {seeForecast ? "Hide" : "See"} Forecast
+                                {seeForecast ? <> &#8679;</> : <> &#8681;</>}
+                            </button>
+                            {seeForecast && <Forecast days={weather.days} />}
                         </>
                     )
                 }{" "}

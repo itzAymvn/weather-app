@@ -1,10 +1,10 @@
 import React from "react";
 import { dateBuilder } from "./LocationBox";
 
-const Forecast = ({ weather }) => {
+const Forecast = ({ days }) => {
     return (
         <div className="forecast">
-            {weather.days.map((day, i) =>
+            {days.map((day, i) =>
                 i > 0 ? (
                     <div className="day" key={i}>
                         <div className="daytime">
@@ -20,19 +20,23 @@ const Forecast = ({ weather }) => {
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td>Max:</td>
+                                        <td>max:</td>
                                         <td>{Math.round(day.tempmax)}°c</td>
                                     </tr>
                                     <tr>
-                                        <td>Avg:</td>
+                                        <td>temp:</td>
                                         <td>{Math.round(day.temp)}°c</td>
                                     </tr>
                                     <tr>
-                                        <td>Min:</td>
+                                        <td>min:</td>
                                         <td>{Math.round(day.tempmin)}°c</td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div className="weather">
+                            <h3>{day.conditions}</h3>
+                            <p>{day.description}</p>
                         </div>
                     </div>
                 ) : null
