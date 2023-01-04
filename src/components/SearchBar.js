@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useCallback, useEffect } from "react";
 
-const SearchBar = ({ setWeather, api, setError }) => {
+const SearchBar = ({ setWeather, api, setIsLoading }) => {
     // Function to get the weather data from the API. (Take the city name as a parameter.)
     const getWeather = useCallback(
         (query) => {
@@ -14,13 +14,14 @@ const SearchBar = ({ setWeather, api, setError }) => {
                     setWeather(res.data);
                 })
                 .catch((err) => {
-                    setError(err.request.response);
+                    throw new Error(err);
                 });
         },
-        [api, setWeather, setError]
+        [api, setWeather]
     );
     // Get the user's location and get the weather data for that location. (Using the ipify and ipapi APIs.)
     useEffect(() => {
+        setIsLoading(true);
         async function getIP() {
             const res = await fetch("https://api.ipify.org?format=json");
             const data = await res.json();
@@ -36,10 +37,16 @@ const SearchBar = ({ setWeather, api, setError }) => {
                 country: data.country,
             };
         }
-        city().then((data) => {
-            getWeather(`${data.city}, ${data.region}, ${data.country}`);
-        });
-    }, [getWeather]);
+
+        city()
+            .then((data) => {
+                getWeather(data.city || data.region || data.country);
+                setIsLoading(false);
+            })
+            .catch(() => {
+                throw new Error("Error getting location.");
+            });
+    }, [getWeather, setIsLoading]);
 
     // Function to handle the form submission.
     const onSubmit = async (e) => {

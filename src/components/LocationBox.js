@@ -43,7 +43,8 @@ const LocationBox = ({ weather }) => {
     return (
         <div className="location-box">
             <div className="location">
-                {weather.address}, {weather.resolvedAddress}
+                <h3>{weather.address}</h3>
+                <h5>{weather.resolvedAddress}</h5>
             </div>
             <div className="date">{currentDate}</div>
         </div>

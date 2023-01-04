@@ -19,8 +19,8 @@ function App() {
     // State to store the weather data.
 
     const [weather, setWeather] = useState({});
-    const [error, setError] = useState("");
     const [seeForecast, setSeeForecast] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     // get the main object from the weather object. (weather.main)
 
@@ -39,7 +39,7 @@ function App() {
                 <SearchBar
                     api={api}
                     setWeather={setWeather}
-                    setError={setError}
+                    setIsLoading={setIsLoading}
                 />
                 {
                     // If the weather object is not empty, render the LocationBox and WeatherBox components.
@@ -57,7 +57,15 @@ function App() {
                         </>
                     )
                 }{" "}
-                {error && <p className="error">{error}</p>}
+                {isLoading && (
+                    <div className="loading">
+                        <div className="lds-facebook">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
