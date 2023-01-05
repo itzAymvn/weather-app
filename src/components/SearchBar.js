@@ -12,9 +12,11 @@ const SearchBar = ({ setWeather, api, setIsLoading }) => {
                 )
                 .then((res) => {
                     setWeather(res.data);
+                    return true;
                 })
-                .catch((err) => {
-                    throw new Error(err);
+                .catch((error) => {
+                    console.log("Error: ", error);
+                    return false;
                 });
         },
         [api, setWeather]
@@ -22,29 +24,34 @@ const SearchBar = ({ setWeather, api, setIsLoading }) => {
     // Get the user's location and get the weather data for that location. (Using the ipify and ipapi APIs.)
     useEffect(() => {
         setIsLoading(true);
-        async function getIP() {
-            const res = await fetch("https://api.ipify.org?format=json");
-            const data = await res.json();
-            return data.ip;
-        }
-        async function city() {
-            const ip = await getIP();
-            const res = await fetch(`https://ipapi.co/${ip}/json/`);
-            const data = await res.json();
-            return {
-                city: data.city,
-                region: data.region,
-                country: data.country,
-            };
+
+        async function getLocationData() {
+            try {
+                const res = await fetch("https://api.ipify.org?format=json");
+                const data = await res.json();
+                const ip = data.ip;
+                const locationRes = await fetch(`https://ipapi.co/${ip}/json/`);
+                const locationData = await locationRes.json();
+                return {
+                    city: locationData.city,
+                    region: locationData.region,
+                    country: locationData.country_name,
+                };
+            } catch (error) {
+                throw new Error("Error getting location data.");
+            }
         }
 
-        city()
+        getLocationData()
             .then((data) => {
-                getWeather(data.city || data.region || data.country);
+                if (getWeather(data.city)) return;
+                if (getWeather(data.region)) return;
+                if (getWeather(data.country)) return;
                 setIsLoading(false);
             })
-            .catch(() => {
-                throw new Error("Error getting location.");
+            .catch((error) => {
+                console.log(error.message);
+                setIsLoading(false);
             });
     }, [getWeather, setIsLoading]);
 
