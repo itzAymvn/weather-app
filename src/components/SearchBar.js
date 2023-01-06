@@ -1,65 +1,68 @@
 import axios from "axios";
 import React, { useCallback, useEffect } from "react";
 
-const SearchBar = ({ setWeather, api, setIsLoading }) => {
+const SearchBar = ({ setWeather, api, setIsLoading, setError }) => {
     // Function to get the weather data from the API. (Take the city name as a parameter.)
     const getWeather = useCallback(
-        (query) => {
+        (queryArray, i) => {
             setWeather({});
-            axios
-                .get(
-                    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${query}?unitGroup=metric&key=${api}&contentType=json`
-                )
-                .then((res) => {
-                    setWeather(res.data);
-                    return true;
-                })
-                .catch((error) => {
-                    console.log("Error: ", error);
-                    return false;
-                });
+            async function getWeatherData() {
+                for (let i = 0; i < queryArray.length; i++) {
+                    const query = queryArray[i];
+                    try {
+                        const res = await axios.get(
+                            `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${query}?unitGroup=metric&key=${api}&contentType=json`
+                        );
+                        if (res.data.status === "error") {
+                            console.log("No results found." + res.data.message);
+                        } else {
+                            setWeather(res.data);
+                            break;
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }
+            getWeatherData();
         },
         [api, setWeather]
     );
-    // Get the user's location and get the weather data for that location. (Using the ipify and ipapi APIs.)
     useEffect(() => {
         setIsLoading(true);
-
-        async function getLocationData() {
-            try {
-                const res = await fetch("https://api.ipify.org?format=json");
-                const data = await res.json();
-                const ip = data.ip;
-                const locationRes = await fetch(`https://ipapi.co/${ip}/json/`);
-                const locationData = await locationRes.json();
-                return {
-                    city: locationData.city,
-                    region: locationData.region,
-                    country: locationData.country_name,
-                };
-            } catch (error) {
-                throw new Error("Error getting location data.");
-            }
+        if (navigator.geolocation) {
+            const success = async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                try {
+                    const res = await fetch(
+                        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+                    );
+                    const data = await res.json();
+                    getWeather([data.city, data.principalSubdivision]);
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+            const error = (err) => {
+                console.warn(` WARNING: ${err.message}`);
+                setError(
+                    "We need your location permission to show the weather automatically. Please allow location access to use this app. Or you can search for a city manually."
+                );
+                setIsLoading(false);
+            };
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            setError("Your browser does not support geolocation.");
+            setIsLoading(false);
         }
+    }, [getWeather, setIsLoading, setError]);
 
-        getLocationData()
-            .then((data) => {
-                if (getWeather(data.city)) return;
-                if (getWeather(data.region)) return;
-                if (getWeather(data.country)) return;
-                setIsLoading(false);
-            })
-            .catch((error) => {
-                console.log(error.message);
-                setIsLoading(false);
-            });
-    }, [getWeather, setIsLoading]);
-
-    // Function to handle the form submission.
     const onSubmit = async (e) => {
         e.preventDefault();
         if (e.target.query.value === "") return;
-        getWeather(e.target.query.value);
+        getWeather([e.target.query.value]);
     };
 
     return (

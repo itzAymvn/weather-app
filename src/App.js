@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // Components
 
@@ -6,6 +6,7 @@ import LocationBox from "./components/LocationBox";
 import SearchBar from "./components/SearchBar";
 import WeatherBox from "./components/WeatherBox";
 import Forecast from "./components/Forecast";
+import Swal from "sweetalert2";
 
 // App()
 
@@ -21,8 +22,15 @@ function App() {
     const [weather, setWeather] = useState({});
     const [seeForecast, setSeeForecast] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
 
     // get the main object from the weather object. (weather.main)
+    useEffect(() => {
+        if (error) Swal.fire("No Permissions", error, "error");
+        return () => {
+            setError("");
+        };
+    }, [error]);
 
     return (
         <div>
@@ -39,6 +47,7 @@ function App() {
                 <SearchBar
                     api={api}
                     setWeather={setWeather}
+                    setError={setError}
                     setIsLoading={setIsLoading}
                 />
                 {
