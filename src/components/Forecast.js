@@ -1,5 +1,6 @@
 import React from "react";
 import { dateBuilder } from "./LocationBox";
+import PropTypes from "prop-types";
 
 const Forecast = ({ days }) => {
     return (
@@ -43,6 +44,10 @@ const Forecast = ({ days }) => {
             )}
         </div>
     );
+};
+
+Forecast.propTypes = {
+    days: PropTypes.array.isRequired,
 };
 
 export default Forecast;

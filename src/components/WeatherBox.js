@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const WeatherBox = ({ weather }) => {
     return (
@@ -10,6 +11,10 @@ const WeatherBox = ({ weather }) => {
             <div className="weather">{weather.description}</div>
         </div>
     );
+};
+
+WeatherBox.propTypes = {
+    weather: PropTypes.object.isRequired,
 };
 
 export default WeatherBox;

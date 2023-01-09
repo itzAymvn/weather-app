@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 // Function that renders the test in the format: Sunday 1 January 2023.
 export const dateBuilder = (d) => {
@@ -49,6 +50,10 @@ const LocationBox = ({ weather }) => {
             <div className="date">{currentDate}</div>
         </div>
     );
+};
+
+LocationBox.propTypes = {
+    weather: PropTypes.object.isRequired,
 };
 
 export default LocationBox;

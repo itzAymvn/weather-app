@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useCallback, useEffect } from "react";
+import PropTypes from "prop-types";
 
 const SearchBar = ({ setWeather, api, setIsLoading, setError }) => {
     // Function to get the weather data from the API. (Take the city name as a parameter.)
@@ -78,6 +79,13 @@ const SearchBar = ({ setWeather, api, setIsLoading, setError }) => {
             </form>
         </div>
     );
+};
+
+SearchBar.propTypes = {
+    setWeather: PropTypes.func.isRequired,
+    api: PropTypes.string.isRequired,
+    setIsLoading: PropTypes.func.isRequired,
+    setError: PropTypes.func.isRequired,
 };
 
 export default SearchBar;
